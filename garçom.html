@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<title>ESPETTO LOUNGE - Painel Garçom</title>
+<style>
+
+body{
+  background:#111;
+  color:white;
+  font-family:Arial;
+  padding:20px;
+}
+
+.pedido{
+  background:#222;
+  padding:15px;
+  margin:15px 0;
+  border-radius:8px;
+}
+
+button{
+  background:#28a745;
+  border:none;
+  padding:8px;
+  color:white;
+  border-radius:5px;
+  cursor:pointer;
+}
+
+</style>
+</head>
+<body>
+
+<h1>📋 Pedidos Recebidos</h1>
+
+<div id="listaPedidos"></div>
+
+<script>
+
+function carregarPedidos(){
+  let pedidos = JSON.parse(localStorage.getItem("pedidosOnline")) || [];
+  let container = document.getElementById("listaPedidos");
+  container.innerHTML="";
+
+  pedidos.forEach(pedido => {
+
+    if(pedido.status === "Pendente"){
+
+      let div = document.createElement("div");
+      div.className="pedido";
+
+      div.innerHTML = `
+        <h3>Mesa ${pedido.mesa}</h3>
+        <p><strong>Cliente:</strong> ${pedido.cliente}</p>
+        <p><strong>Itens:</strong></p>
+        <ul>
+          ${pedido.itens.map(item=>`<li>${item.nome}</li>`).join("")}
+        </ul>
+        <p><strong>Total:</strong> R$ ${pedido.total.toFixed(2)}</p>
+        <button onclick="finalizarPedido(${pedido.id})">Marcar como Entregue</button>
+      `;
+
+      container.appendChild(div);
+    }
+
+  });
+}
+
+function finalizarPedido(id){
+  let pedidos = JSON.parse(localStorage.getItem("pedidosOnline")) || [];
+
+  pedidos = pedidos.map(p => {
+    if(p.id === id){
+      p.status = "Entregue";
+    }
+    return p;
+  });
+
+  localStorage.setItem("pedidosOnline", JSON.stringify(pedidos));
+  carregarPedidos();
+}
+
+setInterval(carregarPedidos, 2000);
+
+</script>
+
+</body>
+</html>
